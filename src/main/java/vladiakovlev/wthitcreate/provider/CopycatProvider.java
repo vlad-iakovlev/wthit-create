@@ -27,6 +27,7 @@ public enum CopycatProvider implements IBlockComponentProvider {
 			return;
 		}
 
+		// tooltip.addLine(new ItemComponent(material.getBlock()));
 		tooltip.addLine(new WrappedComponent(material.getBlock().getName()));
 	}
 

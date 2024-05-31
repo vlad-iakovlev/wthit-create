@@ -20,13 +20,14 @@ public enum PlacardProvider implements IBlockComponentProvider {
 	@Override
 	public void appendBody(ITooltip tooltip, IBlockAccessor accessor, IPluginConfig config) {
 		var placard = (PlacardBlockEntity) accessor.getBlockEntity();
-		var item = placard.getHeldItem();
+		var itemStack = placard.getHeldItem();
 
-		if (item.isEmpty()) {
+		if (itemStack.isEmpty()) {
 			return;
 		}
 
-		tooltip.addLine(new WrappedComponent(item.getHoverName()));
+		// tooltip.addLine(new ItemComponent(itemStack));
+		tooltip.addLine(new WrappedComponent(itemStack.getHoverName()));
 	}
 
 }
