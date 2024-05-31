@@ -25,8 +25,10 @@ import vladiakovlev.wthitcreate.WTHITCreate;
 public enum BacktankProvider implements IBlockComponentProvider, IDataProvider<BacktankBlockEntity> {
 	INSTANCE;
 
-	private static final String STORED_KEY = WTHITCreate.MOD_ID + ".backtank.stored";
-	private static final String CAPACITY_KEY = WTHITCreate.MOD_ID + ".backtank.capacity";
+	private static final String PROVIDER_ID = WTHITCreate.MOD_ID + ".backtank";
+
+	private static final String STORED_KEY = PROVIDER_ID + ".stored";
+	private static final String CAPACITY_KEY = PROVIDER_ID + ".capacity";
 
 	private static final ResourceLocation CAPACITY_ENCHANTMENT_ID = EnchantmentHelper
 			.getEnchantmentId(AllEnchantments.CAPACITY.get());
