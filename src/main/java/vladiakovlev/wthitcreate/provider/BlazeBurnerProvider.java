@@ -67,13 +67,14 @@ public enum BlazeBurnerProvider implements IBlockComponentProvider, IDataProvide
 
 	@Override
 	public void appendData(IDataWriter data, IServerAccessor<BlazeBurnerBlockEntity> accessor, IPluginConfig config) {
-		var burner = accessor.getTarget();
-		var isCreative = burner.isCreative();
-		var activeFuel = isCreative ? getCreativeFuel(burner) : burner.getActiveFuel();
-		var remainingBurnTime = burner.getRemainingBurnTime();
+		data.add(Data.class, res -> {
+			var target = accessor.getTarget();
+			var isCreative = target.isCreative();
+			var activeFuel = isCreative ? getCreativeFuel(target) : target.getActiveFuel();
+			var remainingBurnTime = target.getRemainingBurnTime();
 
-		data.add(Data.class, res -> res.add(new Data(isCreative, activeFuel, remainingBurnTime)));
-
+			res.add(new Data(isCreative, activeFuel, remainingBurnTime));
+		});
 	}
 
 	private static FuelType getCreativeFuel(BlazeBurnerBlockEntity burner) {

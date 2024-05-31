@@ -57,11 +57,13 @@ public enum BacktankProvider implements IBlockComponentProvider, IDataProvider<B
 
 	@Override
 	public void appendData(IDataWriter data, IServerAccessor<BacktankBlockEntity> accessor, IPluginConfig config) {
-		var backtank = accessor.getTarget();
-		var stored = backtank.getAirLevel();
-		var capacity = BacktankUtil.maxAir(getCapacityEnchantmentLevel(backtank));
+		data.add(Data.class, res -> {
+			var target = accessor.getTarget();
+			var stored = target.getAirLevel();
+			var capacity = BacktankUtil.maxAir(getCapacityEnchantmentLevel(target));
 
-		data.add(Data.class, res -> res.add(new Data(stored, capacity)));
+			res.add(new Data(stored, capacity));
+		});
 	}
 
 	private static int getCapacityEnchantmentLevel(BacktankBlockEntity backtank) {
