@@ -1,3 +1,8 @@
 {
-	"wthit-create.backtank.air": "Air"
+	"wthit-create.backtank.air": "Air",
+	"wthit-create.blaze-burner.state": "State",
+	"wthit-create.blaze-burner.state.smouldering": "Smouldering",
+	"wthit-create.blaze-burner.state.kindled": "Kindled",
+	"wthit-create.blaze-burner.state.seething": "Seething",
+	"wthit-create.blaze-burner.remaining-time": "Remaining time"
 }
