@@ -26,7 +26,7 @@ import vladiakovlev.wthitcreate.WTHITCreate;
 public enum BlazeBurnerProvider implements IBlockComponentProvider, IDataProvider<BlazeBurnerBlockEntity> {
 	INSTANCE;
 
-	public static final ResourceLocation ID = new ResourceLocation(WTHITCreate.MOD_ID, "blaze-burner");
+	private static final ResourceLocation ID = new ResourceLocation(WTHITCreate.MOD_ID, "blaze-burner");
 
 	public void register(IRegistrar registrar) {
 		registrar.addDataType(ID, Data.class, Data::read);
@@ -84,7 +84,7 @@ public enum BlazeBurnerProvider implements IBlockComponentProvider, IDataProvide
 		};
 	}
 
-	public record Data(boolean isCreative, FuelType activeFuel, int remainingBurnTime) implements IData {
+	private record Data(boolean isCreative, FuelType activeFuel, int remainingBurnTime) implements IData {
 
 		private static final int VERSION = 1;
 
