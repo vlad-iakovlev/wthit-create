@@ -21,6 +21,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.StringUtil;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import vladiakovlev.wthitcreate.WTHITCreate;
 
@@ -32,12 +33,8 @@ public enum BacktankProvider implements IBlockComponentProvider, IDataProvider<B
 	private static final ResourceLocation CAPACITY_ENCHANTMENT_ID = EnchantmentHelper
 			.getEnchantmentId(AllEnchantments.CAPACITY.get());
 
-	private static String formatSeconds(int seconds) {
-		return "%02d:%02d".formatted(seconds / 60, seconds % 60);
-	}
-
 	public void register(IRegistrar registrar) {
-		registrar.addDataType(ID, Data.class, Data::new);
+		registrar.addDataType(ID, Data.class, Data::read);
 		registrar.addComponent(this, TooltipPosition.BODY, BacktankBlockEntity.class);
 		registrar.addBlockData(this, BacktankBlockEntity.class);
 	}
@@ -50,7 +47,8 @@ public enum BacktankProvider implements IBlockComponentProvider, IDataProvider<B
 		}
 
 		var ratio = (float) (data.stored / data.capacity);
-		var text = formatSeconds(data.stored) + "/" + formatSeconds(data.capacity);
+		var text = StringUtil.formatTickDuration(data.stored * 20) + "/"
+				+ StringUtil.formatTickDuration(data.capacity * 20);
 
 		tooltip.addLine(new PairComponent(
 				new WrappedComponent(Component.translatable("wthit-create.backtank.air")),
@@ -61,12 +59,12 @@ public enum BacktankProvider implements IBlockComponentProvider, IDataProvider<B
 	public void appendData(IDataWriter data, IServerAccessor<BacktankBlockEntity> accessor, IPluginConfig config) {
 		var backtank = accessor.getTarget();
 		var stored = backtank.getAirLevel();
-		var capacity = BacktankUtil.maxAir(getEnchantmentLevel(backtank));
+		var capacity = BacktankUtil.maxAir(getCapacityEnchantmentLevel(backtank));
 
 		data.add(Data.class, res -> res.add(new Data(stored, capacity)));
 	}
 
-	private int getEnchantmentLevel(BacktankBlockEntity backtank) {
+	private static int getCapacityEnchantmentLevel(BacktankBlockEntity backtank) {
 		for (var tag : backtank.getEnchantmentTag()) {
 			var compoundTag = (CompoundTag) tag;
 			ResourceLocation enchantmentId = EnchantmentHelper.getEnchantmentId(compoundTag);
@@ -81,12 +79,19 @@ public enum BacktankProvider implements IBlockComponentProvider, IDataProvider<B
 
 	public record Data(int stored, int capacity) implements IData {
 
-		public Data(FriendlyByteBuf buf) {
-			this(buf.readInt(), buf.readInt());
+		private static final int VERSION = 1;
+
+		public static Data read(FriendlyByteBuf buf) {
+			if (buf.readInt() != VERSION) {
+				return null;
+			}
+
+			return new Data(buf.readInt(), buf.readInt());
 		}
 
 		@Override
 		public void write(FriendlyByteBuf buf) {
+			buf.writeInt(VERSION);
 			buf.writeInt(stored);
 			buf.writeInt(capacity);
 		}
