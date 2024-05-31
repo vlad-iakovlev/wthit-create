@@ -6,6 +6,7 @@ import com.simibubi.create.content.equipment.armor.BacktankUtil;
 
 import mcp.mobius.waila.api.IBlockAccessor;
 import mcp.mobius.waila.api.IBlockComponentProvider;
+import mcp.mobius.waila.api.IData;
 import mcp.mobius.waila.api.IDataProvider;
 import mcp.mobius.waila.api.IDataWriter;
 import mcp.mobius.waila.api.IPluginConfig;
@@ -17,6 +18,7 @@ import mcp.mobius.waila.api.component.BarComponent;
 import mcp.mobius.waila.api.component.PairComponent;
 import mcp.mobius.waila.api.component.WrappedComponent;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
@@ -25,10 +27,7 @@ import vladiakovlev.wthitcreate.WTHITCreate;
 public enum BacktankProvider implements IBlockComponentProvider, IDataProvider<BacktankBlockEntity> {
 	INSTANCE;
 
-	private static final String PROVIDER_ID = WTHITCreate.MOD_ID + ".backtank";
-
-	private static final String STORED_KEY = PROVIDER_ID + ".stored";
-	private static final String CAPACITY_KEY = PROVIDER_ID + ".capacity";
+	public static final ResourceLocation ID = new ResourceLocation(WTHITCreate.MOD_ID, "backtank");
 
 	private static final ResourceLocation CAPACITY_ENCHANTMENT_ID = EnchantmentHelper
 			.getEnchantmentId(AllEnchantments.CAPACITY.get());
@@ -38,22 +37,20 @@ public enum BacktankProvider implements IBlockComponentProvider, IDataProvider<B
 	}
 
 	public void register(IRegistrar registrar) {
+		registrar.addDataType(ID, Data.class, Data::new);
 		registrar.addComponent(this, TooltipPosition.BODY, BacktankBlockEntity.class);
 		registrar.addBlockData(this, BacktankBlockEntity.class);
 	}
 
 	@Override
 	public void appendBody(ITooltip tooltip, IBlockAccessor accessor, IPluginConfig config) {
-		var data = accessor.getData();
-		var stored = data.raw().getInt(STORED_KEY);
-		var capacity = data.raw().getInt(CAPACITY_KEY);
-
-		var ratio = 0f;
-		var text = formatSeconds(stored);
-		if (capacity > 0) {
-			ratio = (float) (stored / capacity);
-			text += "/" + formatSeconds(capacity);
+		var data = accessor.getData().get(Data.class);
+		if (data == null) {
+			return;
 		}
+
+		var ratio = (float) (data.stored / data.capacity);
+		var text = formatSeconds(data.stored) + "/" + formatSeconds(data.capacity);
 
 		tooltip.addLine(new PairComponent(
 				new WrappedComponent(Component.translatable("wthit-create.backtank.air")),
@@ -63,9 +60,10 @@ public enum BacktankProvider implements IBlockComponentProvider, IDataProvider<B
 	@Override
 	public void appendData(IDataWriter data, IServerAccessor<BacktankBlockEntity> accessor, IPluginConfig config) {
 		var backtank = accessor.getTarget();
+		var stored = backtank.getAirLevel();
+		var capacity = BacktankUtil.maxAir(getEnchantmentLevel(backtank));
 
-		data.raw().putInt(STORED_KEY, backtank.getAirLevel());
-		data.raw().putInt(CAPACITY_KEY, BacktankUtil.maxAir(getEnchantmentLevel(backtank)));
+		data.add(Data.class, res -> res.add(new Data(stored, capacity)));
 	}
 
 	private int getEnchantmentLevel(BacktankBlockEntity backtank) {
@@ -79,6 +77,20 @@ public enum BacktankProvider implements IBlockComponentProvider, IDataProvider<B
 		}
 
 		return 0;
+	}
+
+	public record Data(int stored, int capacity) implements IData {
+
+		public Data(FriendlyByteBuf buf) {
+			this(buf.readInt(), buf.readInt());
+		}
+
+		@Override
+		public void write(FriendlyByteBuf buf) {
+			buf.writeInt(stored);
+			buf.writeInt(capacity);
+		}
+
 	}
 
 }
