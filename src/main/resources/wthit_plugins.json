@@ -1,0 +1,7 @@
+{
+  "wthit-create:main": {
+    "initializer": "vladiakovlev.wthitcreate.WTHITCreatePlugin",
+    "side": "*",
+    "required": ["create"]
+  }
+}
