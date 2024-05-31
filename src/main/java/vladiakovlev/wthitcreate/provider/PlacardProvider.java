@@ -21,7 +21,7 @@ public enum PlacardProvider implements IBlockComponentProvider {
 	public void appendBody(ITooltip tooltip, IBlockAccessor accessor, IPluginConfig config) {
 		var placard = (PlacardBlockEntity) accessor.getBlockEntity();
 
-		if (!placard.getHeldItem().isEmpty()) {
+		if (placard.getHeldItem().isEmpty()) {
 			return;
 		}
 
