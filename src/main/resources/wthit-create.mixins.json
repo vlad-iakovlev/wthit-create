@@ -2,7 +2,9 @@
 	"required": true,
 	"package": "vladiakovlev.wthitcreate.mixin",
 	"compatibilityLevel": "JAVA_17",
-	"mixins": [],
+	"mixins": [
+		"FilterItemMixin"
+	],
 	"injectors": {
 		"defaultRequire": 1
 	}
