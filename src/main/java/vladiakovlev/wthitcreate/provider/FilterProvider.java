@@ -41,7 +41,6 @@ public enum FilterProvider implements IBlockComponentProvider {
 			return;
 		}
 
-		// TODO: Use ItemListComponent
 		if (filter.getItem() instanceof FilterItem item) {
 			var filterItem = (FilterItem & FilterItemMixin) item;
 			var createTooltip = filterItem.wthitcreate$makeSummary(filter);

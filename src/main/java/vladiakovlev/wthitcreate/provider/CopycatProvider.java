@@ -9,9 +9,9 @@ import mcp.mobius.waila.api.IPluginConfig;
 import mcp.mobius.waila.api.IRegistrar;
 import mcp.mobius.waila.api.ITooltip;
 import mcp.mobius.waila.api.TooltipPosition;
-import mcp.mobius.waila.api.component.WrappedComponent;
 import net.minecraft.resources.ResourceLocation;
 import vladiakovlev.wthitcreate.WTHITCreate;
+import vladiakovlev.wthitcreate.component.NamedItemComponent;
 
 public enum CopycatProvider implements IBlockComponentProvider {
 	INSTANCE;
@@ -37,8 +37,7 @@ public enum CopycatProvider implements IBlockComponentProvider {
 			return;
 		}
 
-		// tooltip.addLine(new ItemComponent(material.getBlock()));
-		tooltip.addLine(new WrappedComponent(material.getBlock().getName()));
+		tooltip.addLine(new NamedItemComponent(material.getBlock()));
 	}
 
 }

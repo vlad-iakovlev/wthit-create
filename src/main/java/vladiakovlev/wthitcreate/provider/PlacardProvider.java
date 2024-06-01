@@ -8,9 +8,9 @@ import mcp.mobius.waila.api.IPluginConfig;
 import mcp.mobius.waila.api.IRegistrar;
 import mcp.mobius.waila.api.ITooltip;
 import mcp.mobius.waila.api.TooltipPosition;
-import mcp.mobius.waila.api.component.WrappedComponent;
 import net.minecraft.resources.ResourceLocation;
 import vladiakovlev.wthitcreate.WTHITCreate;
+import vladiakovlev.wthitcreate.component.NamedItemComponent;
 
 public enum PlacardProvider implements IBlockComponentProvider {
 	INSTANCE;
@@ -36,8 +36,7 @@ public enum PlacardProvider implements IBlockComponentProvider {
 			return;
 		}
 
-		// tooltip.addLine(new ItemComponent(itemStack));
-		tooltip.addLine(new WrappedComponent(itemStack.getHoverName()));
+		tooltip.addLine(new NamedItemComponent(itemStack));
 	}
 
 }
