@@ -31,6 +31,9 @@
 		"fabric-api": "*",
 		"wthit": "*"
 	},
+	"recommends": {
+		"megane": "*"
+	},
 	"suggests": {
 		"another-mod": "*"
 	}
