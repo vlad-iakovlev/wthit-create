@@ -5,6 +5,7 @@ import mcp.mobius.waila.api.IWailaPlugin;
 import vladiakovlev.wthitcreate.provider.BacktankProvider;
 import vladiakovlev.wthitcreate.provider.BlazeBurnerProvider;
 import vladiakovlev.wthitcreate.provider.CopycatProvider;
+import vladiakovlev.wthitcreate.provider.FluidTankProvider;
 import vladiakovlev.wthitcreate.provider.PlacardProvider;
 
 public class WTHITCreatePlugin implements IWailaPlugin {
@@ -14,6 +15,7 @@ public class WTHITCreatePlugin implements IWailaPlugin {
 		BacktankProvider.INSTANCE.register(registrar);
 		BlazeBurnerProvider.INSTANCE.register(registrar);
 		CopycatProvider.INSTANCE.register(registrar);
+		FluidTankProvider.INSTANCE.register(registrar);
 		PlacardProvider.INSTANCE.register(registrar);
 	}
 
