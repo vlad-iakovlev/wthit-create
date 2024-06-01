@@ -53,7 +53,7 @@ public enum BacktankProvider implements IBlockComponentProvider, IDataProvider<B
 			return;
 		}
 
-		var ratio = (float) (data.stored / data.capacity);
+		var ratio = (float) data.stored / (float) data.capacity;
 		var text = StringUtil.formatTickDuration(data.stored * 20) + "/"
 				+ StringUtil.formatTickDuration(data.capacity * 20);
 
