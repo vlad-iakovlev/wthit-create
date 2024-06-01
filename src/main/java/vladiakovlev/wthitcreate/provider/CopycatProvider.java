@@ -10,16 +10,26 @@ import mcp.mobius.waila.api.IRegistrar;
 import mcp.mobius.waila.api.ITooltip;
 import mcp.mobius.waila.api.TooltipPosition;
 import mcp.mobius.waila.api.component.WrappedComponent;
+import net.minecraft.resources.ResourceLocation;
+import vladiakovlev.wthitcreate.WTHITCreate;
 
 public enum CopycatProvider implements IBlockComponentProvider {
 	INSTANCE;
 
+	private static final ResourceLocation CONFIG_COPYCAT_MATERIAL = new ResourceLocation(WTHITCreate.MOD_ID,
+			"copycat-material");
+
 	public void register(IRegistrar registrar) {
+		registrar.addFeatureConfig(CONFIG_COPYCAT_MATERIAL, true);
 		registrar.addComponent(this, TooltipPosition.BODY, CopycatBlockEntity.class);
 	}
 
 	@Override
 	public void appendBody(ITooltip tooltip, IBlockAccessor accessor, IPluginConfig config) {
+		if (!config.getBoolean(CONFIG_COPYCAT_MATERIAL)) {
+			return;
+		}
+
 		var copycat = (CopycatBlockEntity) accessor.getBlockEntity();
 		var material = copycat.getMaterial();
 

@@ -27,8 +27,11 @@ public enum BlazeBurnerProvider implements IBlockComponentProvider, IDataProvide
 	INSTANCE;
 
 	private static final ResourceLocation ID = new ResourceLocation(WTHITCreate.MOD_ID, "blaze-burner");
+	private static final ResourceLocation CONFIG_BLAZE_BURNER_STATE = new ResourceLocation(WTHITCreate.MOD_ID,
+			"blaze-burner-state");
 
 	public void register(IRegistrar registrar) {
+		registrar.addFeatureConfig(CONFIG_BLAZE_BURNER_STATE, true);
 		registrar.addDataType(ID, Data.class, Data::read);
 		registrar.addComponent(this, TooltipPosition.BODY, BlazeBurnerBlockEntity.class);
 		registrar.addBlockData(this, BlazeBurnerBlockEntity.class);
@@ -36,6 +39,10 @@ public enum BlazeBurnerProvider implements IBlockComponentProvider, IDataProvide
 
 	@Override
 	public void appendBody(ITooltip tooltip, IBlockAccessor accessor, IPluginConfig config) {
+		if (!config.getBoolean(CONFIG_BLAZE_BURNER_STATE)) {
+			return;
+		}
+
 		var data = accessor.getData().get(Data.class);
 		if (data == null) {
 			return;

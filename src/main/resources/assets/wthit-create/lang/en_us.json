@@ -1,4 +1,10 @@
 {
+	"config.waila.plugin_wthit-create": "Create",
+	"config.waila.plugin_wthit-create.backtank-level": "Show Backtank Level",
+	"config.waila.plugin_wthit-create.blaze-burner-state": "Show Blaze Burner State",
+	"config.waila.plugin_wthit-create.copycat-material": "Show Copycat Material",
+	"config.waila.plugin_wthit-create.placard-item": "Show Placard Item",
+
 	"wthit-create.backtank.air": "Air",
 
 	"wthit-create.blaze-burner.state": "State",

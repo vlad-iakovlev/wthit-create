@@ -29,11 +29,14 @@ public enum BacktankProvider implements IBlockComponentProvider, IDataProvider<B
 	INSTANCE;
 
 	private static final ResourceLocation ID = new ResourceLocation(WTHITCreate.MOD_ID, "backtank");
+	private static final ResourceLocation CONFIG_BACKTANK_LEVEL = new ResourceLocation(WTHITCreate.MOD_ID,
+			"backtank-level");
 
 	private static final ResourceLocation CAPACITY_ENCHANTMENT_ID = EnchantmentHelper
 			.getEnchantmentId(AllEnchantments.CAPACITY.get());
 
 	public void register(IRegistrar registrar) {
+		registrar.addFeatureConfig(CONFIG_BACKTANK_LEVEL, true);
 		registrar.addDataType(ID, Data.class, Data::read);
 		registrar.addComponent(this, TooltipPosition.BODY, BacktankBlockEntity.class);
 		registrar.addBlockData(this, BacktankBlockEntity.class);
@@ -41,6 +44,10 @@ public enum BacktankProvider implements IBlockComponentProvider, IDataProvider<B
 
 	@Override
 	public void appendBody(ITooltip tooltip, IBlockAccessor accessor, IPluginConfig config) {
+		if (!config.getBoolean(CONFIG_BACKTANK_LEVEL)) {
+			return;
+		}
+
 		var data = accessor.getData().get(Data.class);
 		if (data == null) {
 			return;
