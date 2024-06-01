@@ -20,11 +20,11 @@ import vladiakovlev.wthitcreate.mixin.FilterItemMixin;
 public enum FilterProvider implements IBlockComponentProvider {
 	INSTANCE;
 
-	private static final ResourceLocation CONFIG_FILTER_ITEMS = new ResourceLocation(WTHITCreate.MOD_ID,
-			"filter-items");
+	private static final ResourceLocation CONFIG_FILTER_SETTINGS = new ResourceLocation(WTHITCreate.MOD_ID,
+			"filter-settings");
 
 	public void register(IRegistrar registrar) {
-		registrar.addFeatureConfig(CONFIG_FILTER_ITEMS, true);
+		registrar.addFeatureConfig(CONFIG_FILTER_SETTINGS, true);
 		registrar.addComponent(this, TooltipPosition.BODY, SmartBlockEntity.class, 2000);
 	}
 
