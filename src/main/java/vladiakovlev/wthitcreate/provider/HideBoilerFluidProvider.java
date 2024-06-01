@@ -9,7 +9,7 @@ import mcp.mobius.waila.api.IRegistrar;
 import mcp.mobius.waila.api.IServerAccessor;
 import mcp.mobius.waila.api.data.FluidData;
 
-public enum FluidTankProvider implements IDataProvider<FluidTankBlockEntity> {
+public enum HideBoilerFluidProvider implements IDataProvider<FluidTankBlockEntity> {
 	INSTANCE;
 
 	public void register(IRegistrar registrar) {
