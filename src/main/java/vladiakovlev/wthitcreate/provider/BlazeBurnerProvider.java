@@ -6,27 +6,35 @@ import com.simibubi.create.content.processing.burner.BlazeBurnerBlockEntity.Fuel
 
 import mcp.mobius.waila.api.IBlockAccessor;
 import mcp.mobius.waila.api.IBlockComponentProvider;
+import mcp.mobius.waila.api.IData;
+import mcp.mobius.waila.api.IDataProvider;
+import mcp.mobius.waila.api.IDataWriter;
 import mcp.mobius.waila.api.IPluginConfig;
 import mcp.mobius.waila.api.IRegistrar;
+import mcp.mobius.waila.api.IServerAccessor;
 import mcp.mobius.waila.api.ITooltip;
 import mcp.mobius.waila.api.TooltipPosition;
 import mcp.mobius.waila.api.component.PairComponent;
 import mcp.mobius.waila.api.component.WrappedComponent;
 import net.minecraft.ChatFormatting;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.StringUtil;
 import vladiakovlev.wthitcreate.WTHITCreate;
 
-public enum BlazeBurnerProvider implements IBlockComponentProvider {
+public enum BlazeBurnerProvider implements IBlockComponentProvider, IDataProvider<BlazeBurnerBlockEntity> {
 	INSTANCE;
 
+	private static final ResourceLocation ID = new ResourceLocation(WTHITCreate.MOD_ID, "blaze-burner");
 	private static final ResourceLocation CONFIG_BLAZE_BURNER_STATE = new ResourceLocation(WTHITCreate.MOD_ID,
 			"blaze-burner-state");
 
 	public void register(IRegistrar registrar) {
 		registrar.addFeatureConfig(CONFIG_BLAZE_BURNER_STATE, true);
+		registrar.addDataType(ID, Data.class, Data::read);
 		registrar.addComponent(this, TooltipPosition.BODY, BlazeBurnerBlockEntity.class);
+		registrar.addBlockData(this, BlazeBurnerBlockEntity.class);
 	}
 
 	@Override
@@ -35,12 +43,12 @@ public enum BlazeBurnerProvider implements IBlockComponentProvider {
 			return;
 		}
 
-		var blazeBurner = (BlazeBurnerBlockEntity) accessor.getBlockEntity();
-		var isCreative = blazeBurner.isCreative();
-		var activeFuel = isCreative ? getCreativeFuel(blazeBurner) : blazeBurner.getActiveFuel();
-		var remainingBurnTime = blazeBurner.getRemainingBurnTime();
+		var data = accessor.getData().get(Data.class);
+		if (data == null) {
+			return;
+		}
 
-		var state = switch (activeFuel) {
+		var state = switch (data.activeFuel) {
 			case NONE -> Component.translatable("wthit-create.blaze-burner.state.smouldering");
 			case NORMAL -> Component.translatable("wthit-create.blaze-burner.state.kindled").withStyle(ChatFormatting.GOLD);
 			case SPECIAL ->
@@ -51,17 +59,29 @@ public enum BlazeBurnerProvider implements IBlockComponentProvider {
 				new WrappedComponent(Component.translatable("wthit-create.blaze-burner.state")),
 				new WrappedComponent(state)));
 
-		if (isCreative) {
+		if (data.isCreative) {
 			tooltip.addLine(new PairComponent(
 					new WrappedComponent(Component.translatable("wthit-create.blaze-burner.remaining-time")),
 					new WrappedComponent("∞")));
 		}
 
-		if (remainingBurnTime > 0) {
+		if (data.remainingBurnTime > 0) {
 			tooltip.addLine(new PairComponent(
 					new WrappedComponent(Component.translatable("wthit-create.blaze-burner.remaining-time")),
-					new WrappedComponent(StringUtil.formatTickDuration(remainingBurnTime))));
+					new WrappedComponent(StringUtil.formatTickDuration(data.remainingBurnTime))));
 		}
+	}
+
+	@Override
+	public void appendData(IDataWriter data, IServerAccessor<BlazeBurnerBlockEntity> accessor, IPluginConfig config) {
+		data.add(Data.class, res -> {
+			var target = accessor.getTarget();
+			var isCreative = target.isCreative();
+			var activeFuel = isCreative ? getCreativeFuel(target) : target.getActiveFuel();
+			var remainingBurnTime = target.getRemainingBurnTime();
+
+			res.add(new Data(isCreative, activeFuel, remainingBurnTime));
+		});
 	}
 
 	private static FuelType getCreativeFuel(BlazeBurnerBlockEntity burner) {
@@ -70,6 +90,28 @@ public enum BlazeBurnerProvider implements IBlockComponentProvider {
 			case NONE -> FuelType.NONE;
 			default -> FuelType.NORMAL;
 		};
+	}
+
+	private record Data(boolean isCreative, FuelType activeFuel, int remainingBurnTime) implements IData {
+
+		private static final int VERSION = 1;
+
+		public static Data read(FriendlyByteBuf buf) {
+			if (buf.readInt() != VERSION) {
+				return null;
+			}
+
+			return new Data(buf.readBoolean(), FuelType.values()[buf.readInt()], buf.readInt());
+		}
+
+		@Override
+		public void write(FriendlyByteBuf buf) {
+			buf.writeInt(VERSION);
+			buf.writeBoolean(isCreative);
+			buf.writeInt(activeFuel.ordinal());
+			buf.writeInt(remainingBurnTime);
+		}
+
 	}
 
 }
