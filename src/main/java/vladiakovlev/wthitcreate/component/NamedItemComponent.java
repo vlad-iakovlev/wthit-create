@@ -1,6 +1,9 @@
+// See: https://github.com/badasintended/wthit/blob/dev/master/src/api/java/mcp/mobius/waila/api/component/NamedItemComponent.java
+
 package vladiakovlev.wthitcreate.component;
 
 import mcp.mobius.waila.api.ITooltipComponent;
+import mcp.mobius.waila.api.WailaHelper;
 import mcp.mobius.waila.api.__internal__.ApiSide;
 import mcp.mobius.waila.api.__internal__.IApiService;
 import net.minecraft.client.Minecraft;
@@ -9,16 +12,20 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 
+/**
+ * Component that renders an {@link ItemStack} with its name.
+ */
 @ApiSide.ClientOnly
 public class NamedItemComponent implements ITooltipComponent {
 
 	public static final NamedItemComponent EMPTY = new NamedItemComponent(ItemStack.EMPTY);
 
-	private static final Font FONT = Minecraft.getInstance().font;
-	public static final int HEIGHT = FONT.lineHeight;
-
 	public NamedItemComponent(ItemStack stack) {
 		this.stack = stack;
+
+		var count = stack.getCount();
+		var name = stack.getHoverName().getString();
+		this.label = count > 1 ? WailaHelper.suffix(count) + " " + name : name;
 	}
 
 	public NamedItemComponent(ItemLike item) {
@@ -26,21 +33,16 @@ public class NamedItemComponent implements ITooltipComponent {
 	}
 
 	public final ItemStack stack;
-
-	private String getText() {
-		var count = stack.getCount();
-		var name = stack.getHoverName().getString();
-		return count > 1 ? count + "x " + name : name;
-	}
+	public final String label;
 
 	@Override
 	public int getWidth() {
-		return FONT.width(getText()) + 10;
+		return getFont().width(label) + 10;
 	}
 
 	@Override
 	public int getHeight() {
-		return HEIGHT;
+		return getFont().lineHeight;
 	}
 
 	@Override
@@ -52,7 +54,11 @@ public class NamedItemComponent implements ITooltipComponent {
 		ctx.renderItem(stack, 0, 0);
 		pose.popPose();
 
-		ctx.drawString(FONT, getText(), x + 10, y, IApiService.INSTANCE.getFontColor());
+		ctx.drawString(getFont(), label, x + 10, y, IApiService.INSTANCE.getFontColor());
+	}
+
+	private Font getFont() {
+		return Minecraft.getInstance().font;
 	}
 
 }
